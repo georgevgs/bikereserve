@@ -12,7 +12,7 @@ neonConfig.webSocketConstructor = ws;
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const db = drizzle(pool, { schema });
 
-async function seed() {
+const seed = async () => {
   console.log('🌱 Seeding database...');
 
   const sampleBikes = [
@@ -78,7 +78,7 @@ async function seed() {
   console.log(`📊 Added ${sampleBikes.length} bikes`);
 
   await pool.end();
-}
+};
 
 seed().catch((error) => {
   console.error('❌ Error seeding database:', error);

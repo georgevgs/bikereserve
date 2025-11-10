@@ -7,29 +7,7 @@ import { bikes } from '@/db/schema';
 
 import type { Bike as BikeType } from '@/db/schema';
 
-export const Route = createFileRoute('/bikes/$bikeId')({
-  component: BikeDetailsPage,
-  loader: async ({ params }) => {
-    const bikeIdString = params.bikeId;
-    console.log('Loader received bike ID:', bikeIdString);
-
-    const bikeId = parseInt(bikeIdString, 10);
-
-    if (isNaN(bikeId)) {
-      throw new Error(`Invalid bike ID: received "${bikeIdString}"`);
-    }
-
-    const bike = await db.select().from(bikes).where(eq(bikes.id, bikeId)).limit(1);
-
-    if (bike.length === 0) {
-      throw new Error('Bike not found');
-    }
-
-    return { bike: bike[0] };
-  },
-});
-
-function BikeDetailsPage() {
+const BikeDetailsPage = () => {
   const { bike } = Route.useLoaderData();
 
   return (
@@ -56,25 +34,47 @@ function BikeDetailsPage() {
       </div>
     </div>
   );
-}
+};
+
+export const Route = createFileRoute('/bikes/$bikeId')({
+  component: BikeDetailsPage,
+  loader: async ({ params }) => {
+    const bikeIdString = params.bikeId;
+    console.log('Loader received bike ID:', bikeIdString);
+
+    const bikeId = parseInt(bikeIdString, 10);
+
+    if (isNaN(bikeId)) {
+      throw new Error(`Invalid bike ID: received "${bikeIdString}"`);
+    }
+
+    const bike = await db.select().from(bikes).where(eq(bikes.id, bikeId)).limit(1);
+
+    if (bike.length === 0) {
+      throw new Error('Bike not found');
+    }
+
+    return { bike: bike[0] };
+  },
+});
 
 interface BikeImageCardProps {
   bike: BikeType;
 }
 
-function BikeImageCard({ bike }: BikeImageCardProps) {
+const BikeImageCard = ({ bike }: BikeImageCardProps) => {
   return (
     <div className="card bg-base-100 shadow-xl">
       <figure className="h-96 bg-base-200">{renderBikeImage(bike)}</figure>
     </div>
   );
-}
+};
 
 interface BikeDetailsCardProps {
   bike: BikeType;
 }
 
-function BikeDetailsCard({ bike }: BikeDetailsCardProps) {
+const BikeDetailsCard = ({ bike }: BikeDetailsCardProps) => {
   return (
     <div className="card bg-base-100 shadow-xl">
       <div className="card-body">
@@ -110,25 +110,25 @@ function BikeDetailsCard({ bike }: BikeDetailsCardProps) {
       </div>
     </div>
   );
-}
+};
 
-function renderBikeImage(bike: BikeType) {
+const renderBikeImage = (bike: BikeType) => {
   if (bike.imageUrl) {
     return <img src={bike.imageUrl} alt={bike.name} className="w-full h-full object-cover" />;
   }
 
   return <Bike className="w-32 h-32 text-base-content opacity-30" />;
-}
+};
 
-function renderBikeDescription(description: string | null) {
+const renderBikeDescription = (description: string | null) => {
   if (!description) {
     return null;
   }
 
   return <p className="text-base-content opacity-80 mb-6">{description}</p>;
-}
+};
 
-function PickupInfoAlert() {
+const PickupInfoAlert = () => {
   return (
     <div className="alert alert-info mt-6">
       <svg
@@ -147,4 +147,4 @@ function PickupInfoAlert() {
       <span>Pick up at our store location. Flexible rental periods available.</span>
     </div>
   );
-}
+};

@@ -5,15 +5,7 @@ import { getBikes } from '@/api/bikes';
 
 import type { Bike as BikeType } from '@/db/schema';
 
-export const Route = createFileRoute('/')({
-  component: HomePage,
-  loader: async () => {
-    const bikes = await getBikes();
-    return { bikes };
-  },
-});
-
-function HomePage() {
+const HomePage = () => {
   const { bikes } = Route.useLoaderData();
 
   return (
@@ -55,9 +47,17 @@ function HomePage() {
       </div>
     </div>
   );
-}
+};
 
-function renderBikesContent(bikes: BikeType[]) {
+export const Route = createFileRoute('/')({
+  component: HomePage,
+  loader: async () => {
+    const bikes = await getBikes();
+    return { bikes };
+  },
+});
+
+const renderBikesContent = (bikes: BikeType[]) => {
   if (bikes.length === 0) {
     return <EmptyBikesState />;
   }
@@ -69,9 +69,9 @@ function renderBikesContent(bikes: BikeType[]) {
       ))}
     </div>
   );
-}
+};
 
-function EmptyBikesState() {
+const EmptyBikesState = () => {
   return (
     <div className="card bg-base-100 shadow-xl">
       <div className="card-body items-center text-center py-16">
@@ -80,13 +80,13 @@ function EmptyBikesState() {
       </div>
     </div>
   );
-}
+};
 
 interface BikeCardProps {
   bike: BikeType;
 }
 
-function BikeCard({ bike }: BikeCardProps) {
+const BikeCard = ({ bike }: BikeCardProps) => {
   return (
     <div className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
       <figure className="h-48 bg-base-200">{renderBikeImage(bike)}</figure>
@@ -118,20 +118,20 @@ function BikeCard({ bike }: BikeCardProps) {
       </div>
     </div>
   );
-}
+};
 
-function renderBikeImage(bike: BikeType) {
+const renderBikeImage = (bike: BikeType) => {
   if (bike.imageUrl) {
     return <img src={bike.imageUrl} alt={bike.name} className="w-full h-full object-cover" />;
   }
 
   return <Bike className="w-20 h-20 text-base-content opacity-30" />;
-}
+};
 
-function renderBikeDescription(description: string | null) {
+const renderBikeDescription = (description: string | null) => {
   if (!description) {
     return null;
   }
 
   return <p className="text-sm opacity-70 line-clamp-2">{description}</p>;
-}
+};
