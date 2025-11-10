@@ -1,18 +1,19 @@
-import { config } from 'dotenv'
-import { drizzle } from 'drizzle-orm/neon-serverless'
-import { Pool, neonConfig } from '@neondatabase/serverless'
-import * as schema from '../schema'
-import ws from 'ws'
+import { config } from 'dotenv';
+import { drizzle } from 'drizzle-orm/neon-serverless';
+import { Pool, neonConfig } from '@neondatabase/serverless';
+import ws from 'ws';
 
-config()
+import * as schema from '../schema';
 
-neonConfig.webSocketConstructor = ws
+config();
 
-const pool = new Pool({ connectionString: process.env.DATABASE_URL })
-const db = drizzle(pool, { schema })
+neonConfig.webSocketConstructor = ws;
+
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+const db = drizzle(pool, { schema });
 
 async function seed() {
-  console.log('🌱 Seeding database...')
+  console.log('🌱 Seeding database...');
 
   const sampleBikes = [
     {
@@ -69,18 +70,17 @@ async function seed() {
       imageUrl: 'https://images.unsplash.com/photo-1571333250630-f0230c320b6d?w=800',
       available: true,
     },
-  ]
+  ];
 
-  await db.insert(schema.bikes).values(sampleBikes)
+  await db.insert(schema.bikes).values(sampleBikes);
 
-  console.log('✅ Database seeded successfully!')
-  console.log(`📊 Added ${sampleBikes.length} bikes`)
-  
-  await pool.end()
+  console.log('✅ Database seeded successfully!');
+  console.log(`📊 Added ${sampleBikes.length} bikes`);
+
+  await pool.end();
 }
 
-seed()
-  .catch((error) => {
-    console.error('❌ Error seeding database:', error)
-    process.exit(1)
-  })
+seed().catch((error) => {
+  console.error('❌ Error seeding database:', error);
+  process.exit(1);
+});
