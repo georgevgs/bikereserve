@@ -8,12 +8,17 @@ import { bikes } from '@/db/schema';
 
 import type { Bike as BikeType } from '@/db/schema';
 
-const getBikeById = createServerFn({
-  method: 'GET',
-})
-  .inputValidator((bikeId: string) => bikeId)
-  .handler(async ({ input }) => {
-    const bikeId = parseInt(input, 10);
+const getBikeById = createServerFn({ method: 'POST' }).handler(
+  async ({ data }: { data: string }) => {
+    const bikeIdString = data;
+    console.log('Server function received:', bikeIdString);
+
+    const bikeId = parseInt(bikeIdString, 10);
+
+    if (isNaN(bikeId)) {
+      throw new Error(`Invalid bike ID: received "${bikeIdString}"`);
+    }
+
     const bike = await db.select().from(bikes).where(eq(bikes.id, bikeId)).limit(1);
 
     if (bike.length === 0) {
@@ -21,12 +26,13 @@ const getBikeById = createServerFn({
     }
 
     return bike[0];
-  });
+  },
+);
 
 export const Route = createFileRoute('/bikes/$bikeId')({
   component: BikeDetailsPage,
   loader: async ({ params }) => {
-    const bike = await getBikeById({ input: params.bikeId });
+    const bike = await getBikeById({ data: params.bikeId });
     return { bike };
   },
 });
@@ -102,14 +108,10 @@ function BikeDetailsCard({ bike }: BikeDetailsCardProps) {
         </div>
 
         <div className="card-actions justify-end mt-6">
-          <Link
-            to="/bikes/$bikeId/reserve"
-            params={{ bikeId: String(bike.id) }}
-            className="btn btn-primary btn-lg btn-block"
-          >
+          <button className="btn btn-primary btn-lg btn-block">
             <Calendar className="w-5 h-5" />
             Reserve This Bike
-          </Link>
+          </button>
         </div>
 
         <PickupInfoAlert />
