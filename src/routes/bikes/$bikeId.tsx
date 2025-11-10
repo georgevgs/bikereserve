@@ -1,6 +1,5 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { Bike, ArrowLeft, Calendar, DollarSign } from 'lucide-react';
-import { createServerFn } from '@tanstack/react-start';
 import { eq } from 'drizzle-orm';
 
 import { db } from '@/db';
@@ -8,10 +7,11 @@ import { bikes } from '@/db/schema';
 
 import type { Bike as BikeType } from '@/db/schema';
 
-const getBikeById = createServerFn({ method: 'POST' }).handler(
-  async ({ data }: { data: string }) => {
-    const bikeIdString = data;
-    console.log('Server function received:', bikeIdString);
+export const Route = createFileRoute('/bikes/$bikeId')({
+  component: BikeDetailsPage,
+  loader: async ({ params }) => {
+    const bikeIdString = params.bikeId;
+    console.log('Loader received bike ID:', bikeIdString);
 
     const bikeId = parseInt(bikeIdString, 10);
 
@@ -25,15 +25,7 @@ const getBikeById = createServerFn({ method: 'POST' }).handler(
       throw new Error('Bike not found');
     }
 
-    return bike[0];
-  },
-);
-
-export const Route = createFileRoute('/bikes/$bikeId')({
-  component: BikeDetailsPage,
-  loader: async ({ params }) => {
-    const bike = await getBikeById({ data: params.bikeId });
-    return { bike };
+    return { bike: bike[0] };
   },
 });
 
